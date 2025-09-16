@@ -6,3 +6,6 @@ Dockerfile
 web/app
 *.db
 testdata
+config.yaml
+docker-compose.yaml
+README.md

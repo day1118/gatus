@@ -1,53 +1,88 @@
+alerting:
+  alertmanager:
+    url: "http://alertmanager:9093"
+    timeout: 10s
+    default-severity: "critical"
+    extra-labels:
+      environment: "test"
+    default-alert:
+      enabled: true
+      failure-threshold: 2
+      success-threshold: 1
+      send-on-resolved: true
+
 endpoints:
-  - name: front-end
-    group: core
-    url: "https://twin.sh/health"
-    interval: 5m
+  # Controllable endpoints - you have full control via API/script
+  - name: "API Service"
+    url: "http://test-server:8080/health/api"
+    interval: 15s
     conditions:
       - "[STATUS] == 200"
-      - "[BODY].status == UP"
-      - "[RESPONSE_TIME] < 150"
+      - "[BODY].healthy == true"
+    alerts:
+      - type: alertmanager
+        description: "API service health check failed"
+        failure-threshold: 1  # Fast failure for testing
 
-  - name: back-end
-    group: core
-    url: "https://example.org/"
-    interval: 5m
+  - name: "Database Service"
+    url: "http://test-server:8080/health/database"
+    interval: 15s
     conditions:
       - "[STATUS] == 200"
-      - "[CERTIFICATE_EXPIRATION] > 48h"
+      - "[BODY].healthy == true"
+    alerts:
+      - type: alertmanager
+        description: "Database connectivity failed"
+        failure-threshold: 1
 
-  - name: monitoring
-    group: internal
-    url: "https://example.org/"
-    interval: 5m
+  - name: "Cache Service"
+    url: "http://test-server:8080/health/cache"
+    interval: 15s
     conditions:
       - "[STATUS] == 200"
+      - "[BODY].healthy == true"
+    alerts:
+      - type: alertmanager
+        description: "Cache service unavailable"
+        failure-threshold: 1
+        provider-override:
+          extra-labels:
+            severity: "warning"
 
-  - name: nas
-    group: internal
-    url: "https://example.org/"
-    interval: 5m
+  # Automatic time-based toggles (no manual control needed)
+  - name: "Minute Toggle"
+    url: "http://test-server:8080/time-based"
+    interval: 15s
     conditions:
       - "[STATUS] == 200"
+      - "[BODY].healthy == true"
+    alerts:
+      - type: alertmanager
+        description: "Time-based test (fails on even minutes)"
+        failure-threshold: 1
 
-  - name: example-dns-query
-    url: "8.8.8.8" # Address of the DNS server to use
-    interval: 5m
-    dns:
-      query-name: "example.com"
-      query-type: "A"
+  - name: "Second Toggle"
+    url: "http://test-server:8080/second-based"
+    interval: 10s
     conditions:
-      - "[BODY] == pat(*.*.*.*)"  # Matches any IPv4 address
-      - "[DNS_RCODE] == NOERROR"
+      - "[STATUS] == 200"
+      - "[BODY].healthy == true"
+    alerts:
+      - type: alertmanager
+        description: "Fast toggle test (fails seconds 0-19)"
+        failure-threshold: 1
 
-  - name: icmp-ping
-    url: "icmp://example.org"
-    interval: 1m
+  # Simple always-failing test
+  - name: "Always Failing Test"
+    url: "https://httpbin.org/status/500"
+    interval: 30s
     conditions:
-      - "[CONNECTED] == true"
-
-  - name: check-domain-expiration
-    url: "https://example.org/"
-    interval: 1h
-    conditions:
-      - "[DOMAIN_EXPIRATION] > 720h"
+      - "[STATUS] == 200"
+    alerts:
+      - type: alertmanager
+        description: "Test endpoint that always fails"
+        failure-threshold: 1
+        provider-override:
+          extra-labels:
+            severity: "warning"
+            test_type: "constant_failure"

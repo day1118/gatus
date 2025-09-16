@@ -1,0 +1,53 @@
+services:
+  gatus:
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - ./config.yaml:/config/config.yaml
+    ports:
+      - 8080:8080
+    networks:
+      - gatus-test
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: gatus-alertmanager
+    ports:
+      - "9093:9093"
+    # volumes:
+    #   - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+      - '--cluster.listen-address='
+    networks:
+      - gatus-test
+
+  test-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.test-server
+    container_name: gatus-test-server
+    ports:
+      - "8082:8080"
+    networks:
+      - gatus-test
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Optional: Add a simple web server for additional testing endpoints
+  httpbin:
+    image: kennethreitz/httpbin
+    container_name: gatus-httpbin
+    ports:
+      - "8081:80"
+    networks:
+      - gatus-test
+
+networks:
+  gatus-test:
+    driver: bridge
