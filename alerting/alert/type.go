@@ -124,4 +124,7 @@ const (
 
 	// TypeZulip is the Type for the Zulip alerting provider
 	TypeZulip Type = "zulip"
+
+	// TypeAlertmanager is the Type for the alertmanager alerting provider
+	TypeAlertmanager Type = "alertmanager"
 )

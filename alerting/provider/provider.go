@@ -41,6 +41,7 @@ import (
 	"github.com/TwiN/gatus/v5/alerting/provider/webex"
 	"github.com/TwiN/gatus/v5/alerting/provider/zapier"
 	"github.com/TwiN/gatus/v5/alerting/provider/zulip"
+	"github.com/TwiN/gatus/v5/alerting/provider/alertmanager"
 	"github.com/TwiN/gatus/v5/config/endpoint"
 )
 
@@ -130,6 +131,7 @@ var (
 	_ AlertProvider = (*webex.AlertProvider)(nil)
 	_ AlertProvider = (*zapier.AlertProvider)(nil)
 	_ AlertProvider = (*zulip.AlertProvider)(nil)
+	_ AlertProvider = (*alertmanager.AlertProvider)(nil)
 
 	// Validate config interface implementation on compile
 	_ Config[awsses.Config]         = (*awsses.Config)(nil)
@@ -171,4 +173,5 @@ var (
 	_ Config[webex.Config]          = (*webex.Config)(nil)
 	_ Config[zapier.Config]         = (*zapier.Config)(nil)
 	_ Config[zulip.Config]          = (*zulip.Config)(nil)
+	_ Config[alertmanager.Config]   = (*alertmanager.Config)(nil)
 )

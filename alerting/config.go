@@ -46,6 +46,7 @@ import (
 	"github.com/TwiN/gatus/v5/alerting/provider/webex"
 	"github.com/TwiN/gatus/v5/alerting/provider/zapier"
 	"github.com/TwiN/gatus/v5/alerting/provider/zulip"
+	"github.com/TwiN/gatus/v5/alerting/provider/alertmanager"
 	"github.com/TwiN/logr"
 )
 
@@ -171,6 +172,9 @@ type Config struct {
 
 	// Zulip is the configuration for the zulip alerting provider
 	Zulip *zulip.AlertProvider `yaml:"zulip,omitempty"`
+
+	// Alertmanager is the configuration for the alertmanager alerting provider
+	Alertmanager *alertmanager.AlertProvider `yaml:"alertmanager,omitempty"`
 }
 
 // GetAlertingProviderByAlertType returns an provider.AlertProvider by its corresponding alert.Type
