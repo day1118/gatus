@@ -575,6 +575,7 @@ func validateAlertingConfig(alertingConfig *alerting.Config, endpoints []*endpoi
 		alert.TypeWebex,
 		alert.TypeZapier,
 		alert.TypeZulip,
+		alert.TypeAlertmanager,
 	}
 	var validProviders, invalidProviders []alert.Type
 	for _, alertType := range alertTypes {

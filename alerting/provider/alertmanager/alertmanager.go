@@ -228,6 +228,22 @@ func (provider *AlertProvider) GetDefaultAlert() *alert.Alert {
 func (provider *AlertProvider) GetConfig(group string, alert *alert.Alert) (*Config, error) {
 	cfg := provider.DefaultConfig
 
+	// Create deep copies of maps to prevent shared state across alerts
+	if cfg.ExtraLabels != nil {
+		extraLabels := make(map[string]string)
+		for k, v := range cfg.ExtraLabels {
+			extraLabels[k] = v
+		}
+		cfg.ExtraLabels = extraLabels
+	}
+	if cfg.ExtraAnnotations != nil {
+		extraAnnotations := make(map[string]string)
+		for k, v := range cfg.ExtraAnnotations {
+			extraAnnotations[k] = v
+		}
+		cfg.ExtraAnnotations = extraAnnotations
+	}
+
 	// Handle group overrides
 	if provider.Overrides != nil {
 		for _, override := range provider.Overrides {
